@@ -1,0 +1,10 @@
+[project]
+name = "illusion-of-thinking"
+version = "0.1.0"
+description = "A Gradio app for exploring the Illusion of Thought experiment puzzles with locally hosted models."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "gradio>=5.34.2",
+    "ollama>=0.5.1",
+]
