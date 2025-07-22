@@ -3,7 +3,7 @@ from functools import partial
 import gradio as gr
 from ollama import Client
 
-from puzzles import TowersOfHanoi, CheckerJumping, RiverCrossing, BlocksWorld
+from puzzles import TowersOfHanoi, CheckerJumping, RiverCrossing, BlocksWorld, NQueens
 
 
 class OllamaClient:
@@ -62,6 +62,7 @@ if __name__ == "__main__":
         CheckerJumping.NAME: CheckerJumping,
         RiverCrossing.NAME: RiverCrossing,
         BlocksWorld.NAME: BlocksWorld,
+        NQueens.NAME: NQueens,
     }
     client = OllamaClient()
 
