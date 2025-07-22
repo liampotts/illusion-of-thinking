@@ -415,6 +415,78 @@ Remember that only the topmost block of each stack can be moved."""
         self.board[position_to].append(self.board[position_from].pop())
 
 
+class NQueens(Puzzle):
+    NAME = "N Queens"
+    SHORT_NAME = "Queens"
+    SYSTEM_PROMPT = """You are a helpful assistant. Solve this puzzle for me. Place n queens on an n x n chess board so that no two queens threaten each other. The board is 0-indexed where the top-left corner is [0, 0].
+
+Example: With n=4 one valid placement is:
+
+moves = [[0, 1], [1, 3], [2, 0], [3, 2]]
+
+This means a queen is placed at row 0 column 1, row 1 column 3, and so on.
+
+Requirements:
+• When exploring potential solutions in your thinking process, always include the corresponding complete list of queen positions.
+• Ensure your final answer includes the list of positions in the format: moves = [[row, column], ...]."""
+
+    USER_PROMPT = "Place {n} queens on a {n}x{n} board so that no two queens attack each other. Provide their positions as 0-indexed coordinates."
+
+    def __init__(self, n: int = 1):
+        self.n = n
+        self.board: list[tuple[int, int]] = []
+
+    def user_prompt(self):
+        return self.USER_PROMPT.format(n=self.n)
+
+    def parse_solution(self, solution: str) -> list[list[int]]:
+        candidates = re.findall(r"moves = (\[\[.*?\]\])", solution)
+        if len(candidates) == 0:
+            raise ValueError(
+                "No moves found in solution. Expected format: moves = [[row, column], ...]"
+            )
+        moves = json.loads(candidates[-1])
+        return moves
+
+    def play(self, moves: list[list[int]]):
+        if len(moves) != self.n:
+            raise ValueError(
+                f"Invalid solution length: {len(moves)}. Expected {self.n} positions."
+            )
+        self.board = []
+        for move in moves:
+            if len(move) != 2 or not all(isinstance(x, int) for x in move):
+                raise ValueError(
+                    f"Invalid position: {move}. Must be a list of two integers: row and column."
+                )
+            self.move(*move)
+
+    def move(self, row: int, col: int):
+        if row < 0 or row >= self.n or col < 0 or col >= self.n:
+            raise ValueError(
+                f"Invalid position: [{row}, {col}]. Must be between 0 and {self.n - 1}."
+            )
+        for r, c in self.board:
+            if r == row or c == col or abs(r - row) == abs(c - col):
+                raise ValueError(
+                    f"Invalid position: [{row}, {col}] conflicts with existing queen at [{r}, {c}]."
+                )
+        self.board.append((row, col))
+
+    def evaluate(self, solution: str) -> tuple[bool, str]:
+        try:
+            moves = self.parse_solution(solution)
+        except ValueError as e:
+            return False, "Failed to parse solution. Error: " + str(e)
+
+        try:
+            self.play(moves)
+        except ValueError as e:
+            return False, "Failed to place queens. Error: " + str(e)
+
+        return True, f"Solved with {self.n} queens."
+
+
 if __name__ == "__main__":
     puzzle = TowersOfHanoi(3)
     solution = "text\nmoves = [[1 , 0, 2], [2, 0, 1], [1, 2, 1], [3, 0, 2], [1, 1, 0], [2, 1, 2], [1, 0, 2]]\ntext"
@@ -430,4 +502,8 @@ if __name__ == "__main__":
 
     puzzle = BlocksWorld(3)
     solution = "text\nmoves = [['B', 0, 2], ['A', 0, 1], ['B', 2, 0], ['A', 1, 2], ['C', 1, 0], ['A', 2, 0]]\ntext"
+    print(puzzle.evaluate(solution))
+
+    puzzle = NQueens(4)
+    solution = "text\nmoves = [[0, 1], [1, 3], [2, 0], [3, 2]]\ntext"
     print(puzzle.evaluate(solution))

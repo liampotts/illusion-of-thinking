@@ -13,6 +13,7 @@ The paper evaluates on four different types of puzzles with varying difficulty l
 2. **Checker Jumping** - A one-dimensional board puzzle where checkers must swap positions
 3. **River Crossing** - A constraint-satisfaction puzzle involving actors and agents crossing a river
 4. **Blocks World** - A planning puzzle requiring rearrangement of stacked blocks
+5. **N Queens** - Place queens on a chess board so that none attack each other
 
 Each puzzle:
 
